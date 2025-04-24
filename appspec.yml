@@ -3,10 +3,11 @@ os: linux
 
 files:
   - source: /
-    destination: /var/www/html/
+    destination: /home/ec2-user/node-ecom/
 
 hooks:
   AfterInstall:
     - location: scripts/install_dependencies.sh
       timeout: 300
       runas: root
+

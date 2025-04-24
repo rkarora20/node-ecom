@@ -1,5 +1,6 @@
 #!/bin/bash
 yum install -y nodejs npm
-cd /var/www/html
+cd /home/ec2-user/node-ecom
 npm install
-npm start &
+nohup npm start > app.log 2>&1 &
+

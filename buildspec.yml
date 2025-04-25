@@ -1,4 +1,3 @@
-
 version: 0.2
 
 phases:
@@ -9,21 +8,8 @@ phases:
       - echo "Installing dependencies..."
       - npm install
 
-  build:
-    commands:
-      - echo "Creating output folder..."
-      - mkdir -p output
-      - echo "Copying files safely to output/"
-      - |
-        for f in index.js app.js server.js package.json public src views; do
-          if [ -e "$f" ]; then
-            cp -r "$f" output/
-          fi
-        done
-      - ls -la output
-
 artifacts:
   files:
     - '**/*'
-  base-directory: output
+  discard-paths: no
 

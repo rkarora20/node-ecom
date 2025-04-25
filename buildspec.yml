@@ -7,15 +7,15 @@ phases:
     commands:
       - echo "Installing dependencies..."
       - npm install
-
-  build:
-    commands:
-      - echo "Build complete. Preparing artifact..."
-      - mkdir -p build
-      - cp -r * build/
+  
+  
+    build:
+      commands:
+        - echo "Packaging build artifacts..."
+        - mkdir -p output
+        - cp -r !("output") output/  # exclude output folder itself
 
 artifacts:
   files:
     - '**/*'
-  base-directory: build
-
+  base-directory: output

@@ -12,7 +12,7 @@ phases:
     commands:
       - echo "Preparing output..."
       - mkdir -p output
-      - cp -r * output/
+      - cp -r index.js package.json output/
       - ls -la output
 
 artifacts:

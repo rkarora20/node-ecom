@@ -1,3 +1,4 @@
+
 version: 0.2
 
 phases:
@@ -10,9 +11,15 @@ phases:
 
   build:
     commands:
-      - echo "Preparing output..."
+      - echo "Creating output folder..."
       - mkdir -p output
-      - cp -r index.js package.json output/
+      - echo "Copying files safely to output/"
+      - |
+        for f in index.js app.js server.js package.json public src views; do
+          if [ -e "$f" ]; then
+            cp -r "$f" output/
+          fi
+        done
       - ls -la output
 
 artifacts:

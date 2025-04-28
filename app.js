@@ -1,38 +1,52 @@
-const express = require('express');
+const AWS = require('aws-sdk');
 const mysql = require('mysql2');
+const express = require('express');
 const app = express();
 const port = process.env.PORT || 3000;
 
-// MySQL RDS connection
-const connection = mysql.createConnection({
-  host: 'ecom-db.cpwqq8k0u00o.ca-central-1.rds.amazonaws.com',  // <-- Replace with your actual RDS endpoint!
-  user: 'admin',
-  password: 'password1234',
+// Setup AWS SDK
+const secretsManager = new AWS.SecretsManager({
+  region: 'ca-central-1'  // Replace with your region
 });
 
-// Connect to database
-connection.connect(error => {
-  if (error) {
-    console.error('Database connection failed: ' + error.stack);
-    return;
+let db;
+
+// Fetch secret first
+secretsManager.getSecretValue({ SecretId: 'rds/ecom/mysql' }, (err, data) => {
+  if (err) {
+    console.error('Unable to fetch RDS credentials:', err);
+    process.exit(1);
+  } else {
+    const secret = JSON.parse(data.SecretString);
+
+    // Now create DB connection using secret
+    db = mysql.createConnection({
+      host: 'your-db-endpoint.rds.amazonaws.com',
+      user: secret.username,
+      password: secret.password,
+      database: 'ecomdb' // (optional - if database created)
+    });
+
+    db.connect(error => {
+      if (error) {
+        console.error('Database connection failed:', error);
+        process.exit(1);
+      }
+      console.log('Connected to RDS database!');
+    });
   }
-  console.log('Connected to the database.');
 });
 
-// Main route
+// Route
 app.get('/', (req, res) => {
-  connection.query('SELECT 1', (err, results) => {
+  if (!db) {
+    return res.status(500).send('DB Connection not ready.');
+  }
+  db.query('SELECT 1', (err, results) => {
     if (err) {
-      console.error('Error querying the database:', err);
-      res.status(500).send('<h1>Database connection failed 💥</h1>');
+      res.status(500).send('Database query failed.');
     } else {
-      res.send(`
-        <h1>Welcome to My E-Commerce Site (DB Connected ✅)</h1>
-        <ul>
-          <li>🧥 Jacket - $59 <button>Buy</button></li>
-          <li>📱 Phone - $699 <button>Buy</button></li>
-        </ul>
-      `);
+      res.send('<h1>Welcome to Secure E-Commerce Site! ✅</h1>');
     }
   });
 });
